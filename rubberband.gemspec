@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["grantr"]
-  s.date = %q{2010-06-22}
+  s.date = %q{2010-06-23}
   s.description = %q{An ElasticSearch Client with ThriftClient-like failover handling.}
   s.email = %q{grantr@gmail.com}
   s.extra_rdoc_files = [
@@ -18,7 +18,8 @@ Gem::Specification.new do |s|
      "TODO"
   ]
   s.files = [
-    ".gitignore",
+    ".gemspec",
+     ".gitignore",
      "LICENSE",
      "README.rdoc",
      "Rakefile",
