@@ -14,15 +14,15 @@ Copyright 2010 Grant Rodgers. See included LICENSE file.
 
 == Usage
 
-Instantiate a client:
+Set up the client:
 
-  client = ElasticSearch.new('127.0.0.1:9200', :index => "twitter", :type => "tweet")
+  ElasticSearch.setup('127.0.0.1:9200', :index => "twitter", :type => "tweet")
 
 API is subject to change, but here is a trivial example:
 
-  client.index({:body => "elasticsearch is cool"}, :id => 1)
-  client.get("1")
-  client.search("body:elasticsearch")
+  ElasticSearch.client.index({:body => "elasticsearch is cool"}, :id => 1)
+  ElasticSearch.client.get("1")
+  ElasticSearch.client.search("body:elasticsearch")
 
 == TODO
 
