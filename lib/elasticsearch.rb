@@ -7,19 +7,7 @@ require 'transport'
 require 'client'
 
 module ElasticSearch
-  class << self
-    attr_accessor :client, :servers, :options
-    
-    def setup(servers=[], options={}, &block)
-      @servers, @options = servers, options
-      if block
-        yield self
-      end
-      self.client
-    end  
-    
-    def client
-      @client ||= ElasticSearch::Client.new(@servers, @options)
-    end
+  def self.new(servers, options={})
+    ElasticSearch::Client.new(servers, options)
   end
 end
