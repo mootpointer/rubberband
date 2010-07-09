@@ -59,20 +59,27 @@ module ElasticSearch
         #query = {:query => query} if query.is_a?(Hash) && !query[:query] # if there is no query element, wrap query in one
         
         valid_options = [:df, :analyzer, :default_operator, :explain, :fields, :field, :sort, 
-                      :from, :size, :search_type, :limit, :per_page, :page, :offset]
+                         :from, :size, :search_type, :limit, :per_page, :page, :offset, :scroll]
         
         search_options = options.reject {|key, val| !valid_options.include?(key)}
+        
+        
         search_options[:size] ||= search_options[:per_page] if search_options[:per_page]
         search_options[:size] ||= search_options[:limit] if search_options[:limit]
         search_options[:from] ||= search_options[:size] * (search_options[:page]-1) if search_options[:page] && search_options[:page].to_i > 1
         search_options[:from] ||= search_options[:offset] if search_options[:offset]
-
+        
         search_options[:fields] = "_id" if options[:ids_only]
-
         response = execute(:search, options[:index], options[:type], query, search_options)
+
         Hits.new(response, options.reject {|key, val| ![:per_page, :page, :ids_only].include?(key)}).freeze #ids_only returns array of ids instead of hits
       end
-
+      
+      def scroll(scroll_id, options={})
+        response = execute(:scroll, scroll_id)
+        Hits.new(response, options.reject {|key, val| ![:per_page, :page, :ids_only].include?(key)}).freeze #ids_only returns array of ids instead of hits
+      end
+        
       #df	 The default field to use when no field prefix is defined within the query.
       #analyzer	 The analyzer name to be used when analyzing the query string.
       #default_operator	 The default operator to be used, can be AND or OR. Defaults to OR.
