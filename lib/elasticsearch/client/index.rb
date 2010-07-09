@@ -57,9 +57,11 @@ module ElasticSearch
 
         #TODO this doesn't work for facets, because they have a valid query key as element. need a list of valid toplevel keys in the search dsl
         #query = {:query => query} if query.is_a?(Hash) && !query[:query] # if there is no query element, wrap query in one
-
-        search_options = slice_hash(options, :df, :analyzer, :default_operator, :explain, :fields, :field, :sort, :from, :size, :search_type, :limit, :per_page, :page, :offset)
-
+        
+        valid_options = [:df, :analyzer, :default_operator, :explain, :fields, :field, :sort, 
+                      :from, :size, :search_type, :limit, :per_page, :page, :offset]
+        
+        search_options = options.reject {|key, val| !valid_options.include?(key)}
         search_options[:size] ||= search_options[:per_page] if search_options[:per_page]
         search_options[:size] ||= search_options[:limit] if search_options[:limit]
         search_options[:from] ||= search_options[:size] * (search_options[:page]-1) if search_options[:page] && search_options[:page].to_i > 1
@@ -68,7 +70,7 @@ module ElasticSearch
         search_options[:fields] = "_id" if options[:ids_only]
 
         response = execute(:search, options[:index], options[:type], query, search_options)
-        Hits.new(response, slice_hash(options, :per_page, :page, :ids_only)).freeze #ids_only returns array of ids instead of hits
+        Hits.new(response, options.reject {|key, val| ![:per_page, :page, :ids_only].include?(key)}).freeze #ids_only returns array of ids instead of hits
       end
 
       #df	 The default field to use when no field prefix is defined within the query.
@@ -77,19 +79,11 @@ module ElasticSearch
       def count(query, options={})
         set_default_scope!(options)
 
-        count_options = slice_hash(options, :df, :analyzer, :default_operator)
+        count_options = options.reject {|key, val| ![:df, :analyzer, :default_operator].include?(key)}
         response = execute(:count, options[:index], options[:type], query, count_options)
         response["count"].to_i #TODO check if count is nil
       end
-
-
-      private
-
-      def slice_hash(hash, *keys)
-        h = {}
-        keys.each { |k| h[k] = hash[k] if hash.has_key?(k) }
-        h
-      end
+      
 
     end
   end
